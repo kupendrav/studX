@@ -1,5 +1,3 @@
-
-```markdown
 # StudX - Student Bus Pass Management System
 
 A modern, full-stack web application for managing student bus passes with real-time QR code generation. Built with cutting-edge technologies for a seamless user experience.
@@ -369,5 +367,3 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) file 
 **Built with ❤️ using Next.js, TypeScript, and Supabase**
 
 **Star ⭐ this repository if you find it helpful!**
-```
-
