@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-type Database = any
+type Database = Record<string, unknown>
 
 let supabaseInstance: ReturnType<typeof createClient>
 

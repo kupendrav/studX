@@ -1,3 +1,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Print styles for ID card bus pass */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-pass,
+  .print-pass * {
+    visibility: visible !important;
+  }
+
+  .print-pass {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 85.6mm !important;
+    height: 53.98mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 3mm !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    transform: none !important;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  nav, footer, .no-print {
+    display: none !important;
+  }
+
+  @page {
+    size: 90mm 58mm;
+    margin: 2mm;
+  }
+}
+
+/* GSAP animation helpers */
+.gsap-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.gsap-scale-in {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.gsap-slide-left {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.gsap-slide-right {
+  opacity: 0;
+  transform: translateX(40px);
+}

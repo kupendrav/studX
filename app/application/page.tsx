@@ -1,9 +1,10 @@
 'use client'
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
+import gsap from 'gsap'
 
 export default function Application() {
   const [user, setUser] = useState<User | null>(null)
@@ -23,6 +24,7 @@ export default function Application() {
   })
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
+  const pageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const checkUser = async () => {
@@ -41,6 +43,16 @@ export default function Application() {
     }
     checkUser()
   }, [router, supabase])
+
+  useEffect(() => {
+    if (user && pageRef.current) {
+      const ctx = gsap.context(() => {
+        gsap.from('.app-card', { opacity: 0, y: 40, duration: 0.6, ease: 'power3.out' })
+        gsap.from('.app-field', { opacity: 0, y: 20, duration: 0.4, stagger: 0.08, delay: 0.3, ease: 'power2.out' })
+      }, pageRef)
+      return () => ctx.revert()
+    }
+  }, [user])
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -74,7 +86,7 @@ export default function Application() {
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
       
       // Upload with proper options
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('student-photos')
         .upload(fileName, photoFile, {
           cacheControl: '3600',
@@ -111,7 +123,7 @@ export default function Application() {
           ...formData,
           photo_url: photoUrl,
           qr_code: qrData,
-          application_status: 'approved'
+          application_status: 'pending'
         }
       ])
       .select()
@@ -123,26 +135,34 @@ export default function Application() {
     }
 
     router.push(`/qr-scan?id=${data.id}`)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Submission error:', error)
-    alert('Error submitting application: ' + error.message)
+    alert('Error submitting application: ' + (error instanceof Error ? error.message : 'Unknown error'))
   } finally {
     setLoading(false)
   }
 }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div ref={pageRef} className="min-h-screen py-6 md:py-12 px-4 bg-gradient-to-br from-gray-50 to-indigo-50">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Bus Pass Application
-          </h1>
+        <div className="app-card bg-white rounded-2xl shadow-2xl p-5 md:p-8">
+          <div className="text-center mb-6 md:mb-8">
+            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Bus Pass Application
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Fill in your details to apply for a student bus pass</p>
+          </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Photo Upload */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="app-field">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Photo <span className="text-red-500">*</span>
               </label>
               <div className="flex items-center gap-4">
@@ -151,7 +171,7 @@ export default function Application() {
                   <img
                     src={photoPreview}
                     alt="Preview"
-                    className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300"
+                    className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg border-2 border-gray-300 flex-shrink-0"
                   />
                 )}
                 <input
@@ -164,135 +184,133 @@ export default function Application() {
               </div>
             </div>
 
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                required
-              />
-            </div>
+            {/* Two-column grid for desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Name */}
+              <div className="app-field">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
+                  required
+                />
+              </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-gray-50"
-                required
-                readOnly
-              />
-            </div>
+              {/* Email */}
+              <div className="app-field">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-gray-50 text-sm"
+                  required
+                  readOnly
+                />
+              </div>
 
-            {/* Registration Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Registration Number <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.regno}
-                onChange={(e) => setFormData({ ...formData, regno: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                required
-              />
-            </div>
+              {/* Registration Number */}
+              <div className="app-field">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Registration Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.regno}
+                  onChange={(e) => setFormData({ ...formData, regno: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
+                  required
+                />
+              </div>
 
-            {/* College */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                College Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.college}
-                onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                required
-              />
+              {/* College */}
+              <div className="app-field">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  College Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.college}
+                  onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
+                  required
+                />
+              </div>
             </div>
 
             {/* Address */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="app-field">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Address <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
                 rows={3}
                 required
               />
             </div>
 
-            {/* Destination From */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                From (Starting Point) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.destination_from}
-                onChange={(e) => setFormData({ ...formData, destination_from: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                required
-              />
-            </div>
-
-            {/* Destination To */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                To (Destination) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.destination_to}
-                onChange={(e) => setFormData({ ...formData, destination_to: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                required
-              />
-            </div>
-
-            {/* Via 1 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Via 1 (Optional)
-              </label>
-              <input
-                type="text"
-                value={formData.via_1}
-                onChange={(e) => setFormData({ ...formData, via_1: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            {/* Via 2 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Via 2 (Optional)
-              </label>
-              <input
-                type="text"
-                value={formData.via_2}
-                onChange={(e) => setFormData({ ...formData, via_2: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-              />
+            {/* Route section */}
+            <div className="app-field bg-indigo-50 rounded-xl p-4 md:p-5">
+              <h3 className="text-sm font-semibold text-indigo-700 mb-4">Route Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    From (Starting Point) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.destination_from}
+                    onChange={(e) => setFormData({ ...formData, destination_from: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    To (Destination) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.destination_to}
+                    onChange={(e) => setFormData({ ...formData, destination_to: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Via 1 (Optional)</label>
+                  <input
+                    type="text"
+                    value={formData.via_1}
+                    onChange={(e) => setFormData({ ...formData, via_1: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Via 2 (Optional)</label>
+                  <input
+                    type="text"
+                    value={formData.via_2}
+                    onChange={(e) => setFormData({ ...formData, via_2: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm bg-white"
+                  />
+                </div>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
+              className="app-field w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3.5 rounded-lg font-semibold text-base md:text-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
             >
               {loading ? 'Submitting...' : 'Submit Application'}
             </button>
