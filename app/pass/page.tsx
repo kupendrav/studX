@@ -175,7 +175,7 @@ function BusPassContent() {
             <div className="pass-detail mt-4 sm:mt-8 bg-white rounded-2xl p-4 sm:p-6 text-center">
               <p className="text-gray-700 font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Scan to Verify</p>
               <div className="inline-block bg-white p-2 sm:p-4 rounded-xl">
-                <QRCode value={passUrl} size={120} />
+                <QRCode value={passUrl} size={160} />
               </div>
               <p className="text-[10px] sm:text-xs text-gray-500 mt-3 sm:mt-4">
                 Valid until: December 31, 2026
@@ -195,7 +195,7 @@ function BusPassContent() {
         <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center no-print">
           <button
             onClick={() => window.print()}
-            className="bg-white text-indigo-600 px-6 sm:px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition inline-flex items-center justify-center gap-2"
+            className="bg-indigo-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 hover:shadow-lg transition inline-flex items-center justify-center gap-2 border-2 border-indigo-700"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -207,7 +207,7 @@ function BusPassContent() {
               navigator.clipboard.writeText(passUrl)
               alert('Pass link copied!')
             }}
-            className="bg-indigo-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition inline-flex items-center justify-center gap-2"
+            className="bg-purple-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 hover:shadow-lg transition inline-flex items-center justify-center gap-2 border-2 border-purple-700"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />

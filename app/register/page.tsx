@@ -25,10 +25,18 @@ export default function Register() {
     }
   }, [])
 
+  const [success, setSuccess] = useState(false)
+
   const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLoading(true)
     setError('')
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setLoading(false)
+      return
+    }
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -42,7 +50,19 @@ export default function Register() {
     }
 
     if (data.user) {
-      router.push('/dashboard')
+      // If email confirmation is required, user.identities will be empty
+      if (data.user.identities && data.user.identities.length === 0) {
+        setError('An account with this email already exists. Please login instead.')
+        setLoading(false)
+        return
+      }
+      // If session exists, user is auto-confirmed — go to dashboard
+      if (data.session) {
+        router.push('/dashboard')
+      } else {
+        // Email confirmation required
+        setSuccess(true)
+      }
     }
     setLoading(false)
   }
@@ -64,6 +84,20 @@ export default function Register() {
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{error}</div>
         )}
+        {success ? (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Registration Successful!</h3>
+            <p className="text-sm text-gray-600 mb-4">Please check your email to confirm your account, then login.</p>
+            <Link href="/login" className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition">
+              Go to Login
+            </Link>
+          </div>
+        ) : (
         <form onSubmit={handleRegister} className="space-y-5">
           <div className="reg-field">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
@@ -96,6 +130,7 @@ export default function Register() {
             {loading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
+        )}
         <p className="reg-field text-center mt-6 text-sm text-gray-600">
           Already have an account?{' '}
           <Link href="/login" className="text-indigo-600 font-semibold hover:underline">Login</Link>
