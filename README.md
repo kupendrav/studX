@@ -244,19 +244,6 @@ npm start
 
 ## 🚢 Deployment
 
-### Deploy to Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Click "Import Project"
-4. Select your repository
-5. Add environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-6. Click **Deploy**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
 ### Deploy to GitHub Pages (Static Export)
 
 This project is configured to auto-deploy to GitHub Pages using `.github/workflows/deploy-pages.yml`.
@@ -380,7 +367,6 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) file 
 - [Next.js](https://nextjs.org/) - The React Framework
 - [Supabase](https://supabase.com/) - Open Source Firebase Alternative
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-First CSS Framework
-- [Vercel](https://vercel.com/) - Deployment Platform
 
 ---
 
