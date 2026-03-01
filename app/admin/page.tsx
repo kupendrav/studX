@@ -33,6 +33,7 @@ interface Application {
 export default function AdminDashboard() {
   const [adminKey, setAdminKey] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isStaticHost, setIsStaticHost] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState('')
 
@@ -56,9 +57,16 @@ export default function AdminDashboard() {
       setAdminKey(stored)
       setIsAuthenticated(true)
     }
+
+    setIsStaticHost(window.location.hostname.endsWith('github.io'))
   }, [])
 
   const handleAdminLogin = async () => {
+    if (isStaticHost) {
+      setAuthError('Admin tools require a server runtime and are unavailable on GitHub Pages.')
+      return
+    }
+
     setAuthLoading(true)
     setAuthError('')
     try {
@@ -220,7 +228,11 @@ export default function AdminDashboard() {
             <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Admin Access
             </h2>
-            <p className="text-sm text-gray-500 mt-2">Enter admin secret key to continue</p>
+            <p className="text-sm text-gray-500 mt-2">
+              {isStaticHost
+                ? 'Admin tools are disabled on GitHub Pages static hosting'
+                : 'Enter admin secret key to continue'}
+            </p>
           </div>
           {authError && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{authError}</div>
@@ -232,13 +244,14 @@ export default function AdminDashboard() {
             onKeyDown={(e) => e.key === 'Enter' && handleAdminLogin()}
             placeholder="Enter admin secret key"
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none mb-4"
+            disabled={isStaticHost}
           />
           <button
             onClick={handleAdminLogin}
-            disabled={authLoading || !adminKey}
+            disabled={isStaticHost || authLoading || !adminKey}
             className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition disabled:opacity-50"
           >
-            {authLoading ? 'Verifying...' : 'Access Admin Panel'}
+            {isStaticHost ? 'Unavailable on GitHub Pages' : authLoading ? 'Verifying...' : 'Access Admin Panel'}
           </button>
         </div>
       </div>

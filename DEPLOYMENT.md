@@ -76,91 +76,31 @@ CREATE POLICY "Anyone can view photos"
   USING (bucket_id = 'student-photos');
 ```
 
-## Vercel Deployment
+**Note:** Keep your Supabase credentials secure and never commit them to version control!
 
-### 1. Connect Repository
+## GitHub Pages Deployment (Static)
 
-1. Go to [vercel.com](https://vercel.com)
-2. Click "Add New Project"
-3. Import your Git repository
-4. Select the repository
+### 1. Repository Settings
 
-### 2. Configure Project
+1. Push this project to GitHub
+2. Open **Settings → Pages**
+3. Set **Source** to **GitHub Actions**
 
-1. Framework Preset: Next.js
-2. Root Directory: `./`
-3. Build Command: `npm run build` (auto-detected)
-4. Output Directory: `.next` (auto-detected)
+### 2. Repository Secrets
 
-### 3. Environment Variables
-
-Add the following in Vercel dashboard:
+Add these secrets in **Settings → Secrets and variables → Actions**:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-Get these from: Supabase Dashboard → Settings → API
+### 3. Deploy
 
-### 4. Deploy
+1. Push to `main` or manually trigger workflow `Deploy to GitHub Pages`
+2. Wait for the workflow to finish
+3. Visit: `https://<github-username>.github.io/<repository-name>/`
 
-Click "Deploy" and wait for the build to complete.
+### 4. Limitation
 
-## Post-Deployment
-
-- [ ] Test user registration
-- [ ] Test user login
-- [ ] Test application submission
-- [ ] Test photo upload
-- [ ] Test QR code generation
-- [ ] Test bus pass display
-- [ ] Test on mobile devices
-- [ ] Check all routes are accessible
-- [ ] Verify authentication redirects work
-- [ ] Test logout functionality
-
-## Production Monitoring
-
-- [ ] Set up error tracking (Sentry, LogRocket, etc.)
-- [ ] Configure analytics (Google Analytics, Vercel Analytics)
-- [ ] Set up uptime monitoring
-- [ ] Configure backup strategy for Supabase
-
-## Security Checklist
-
-- [ ] Environment variables are not exposed in client code
-- [ ] RLS policies are properly configured
-- [ ] File upload size limits are set
-- [ ] API rate limiting is considered
-- [ ] HTTPS is enforced
-- [ ] Security headers are configured (check `vercel.json`)
-- [ ] Authentication tokens are secure
-- [ ] Sensitive data is not logged
-
-## Performance Optimization
-
-- [ ] Images are optimized
-- [ ] Code splitting is implemented (Next.js default)
-- [ ] Critical CSS is inlined
-- [ ] Fonts are optimized (using next/font)
-- [ ] Lighthouse score > 90
-
-## Documentation
-
-- [ ] README.md is up to date
-- [ ] API documentation (if applicable)
-- [ ] Environment variables documented
-- [ ] Deployment process documented
-- [ ] Known issues documented
-
-## Support
-
-- [ ] Error messages are user-friendly
-- [ ] Contact information is available
-- [ ] FAQ section created (optional)
-- [ ] Support email configured
-
----
-
-**Note:** Keep your Supabase credentials secure and never commit them to version control!
+GitHub Pages is static hosting only. API route handlers are not supported, so admin API tools are unavailable on GitHub Pages.

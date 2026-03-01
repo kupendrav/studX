@@ -34,7 +34,7 @@ function QRScanContent() {
 
   useEffect(() => {
     if (showPass && id) {
-      router.push(`/pass/${id}`)
+      router.push(`/pass?id=${id}`)
     }
   }, [showPass, id, router])
 
@@ -61,7 +61,7 @@ function QRScanContent() {
           </p>
           {siteUrl && id ? (
             <div className="bg-white p-3 md:p-4 rounded-lg inline-block">
-              <QRCode value={`${siteUrl}/pass/${id}`} size={180} />
+              <QRCode value={`${siteUrl}/pass/?id=${id}`} size={180} />
             </div>
           ) : (
             <p className="text-sm text-gray-500">Preparing QR code...</p>

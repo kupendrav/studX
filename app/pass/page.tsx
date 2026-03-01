@@ -1,15 +1,16 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import type { Student } from '@/types'
 import QRCode from 'react-qr-code'
 import gsap from 'gsap'
 
-export default function BusPass() {
-  const params = useParams()
-  const id = params.id as string
+function BusPassContent() {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
   const [student, setStudent] = useState<Student | null>(null)
   const [loading, setLoading] = useState(true)
   const passRef = useRef<HTMLDivElement>(null)
@@ -19,6 +20,11 @@ export default function BusPass() {
 
   useEffect(() => {
     const fetchStudent = async () => {
+      if (!id) {
+        setLoading(false)
+        return
+      }
+
       try {
         const { data, error } = await supabase
           .from('students')
@@ -38,7 +44,7 @@ export default function BusPass() {
       }
     }
 
-    if (id) fetchStudent()
+    fetchStudent()
   }, [id, supabase])
 
   useEffect(() => {
@@ -70,7 +76,7 @@ export default function BusPass() {
     )
   }
 
-  const passUrl = `${siteUrl}/pass/${student.id}`
+  const passUrl = `${siteUrl}/pass/?id=${student.id}`
 
   return (
     <div ref={passRef} className="min-h-screen py-6 md:py-12 px-4">
@@ -211,5 +217,17 @@ export default function BusPass() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BusPass() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    }>
+      <BusPassContent />
+    </Suspense>
   )
 }

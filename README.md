@@ -257,6 +257,26 @@ npm start
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
+### Deploy to GitHub Pages (Static Export)
+
+This project is configured to auto-deploy to GitHub Pages using `.github/workflows/deploy-pages.yml`.
+
+1. Push your code to the `main` branch
+2. In your GitHub repo, open **Settings → Pages**
+3. Set **Source** to **GitHub Actions**
+4. Add repository secrets:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Run the **Deploy to GitHub Pages** workflow (or push to `main`)
+
+Your site will be published at:
+
+`https://<github-username>.github.io/<repository-name>/`
+
+#### GitHub Pages Limitation
+
+GitHub Pages is static hosting only. Server-side API routes are not available, so the admin API tools are disabled on Pages.
+
 ### Other Deployment Options
 
 - **Netlify** - Connect your GitHub repo and deploy

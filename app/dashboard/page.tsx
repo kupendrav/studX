@@ -239,7 +239,7 @@ export default function Dashboard() {
                 {isApproved && (
                   <>
                     <Link
-                      href={`/pass/${application.id}`}
+                      href={`/pass?id=${application.id}`}
                       className="flex flex-col items-center gap-2 p-4 md:p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl hover:shadow-md transition border border-indigo-100"
                     >
                       <span className="text-2xl md:text-3xl">🎫</span>
@@ -253,7 +253,7 @@ export default function Dashboard() {
                       <span className="text-xs md:text-sm font-semibold text-green-700 text-center">QR Code</span>
                     </Link>
                     <button
-                      onClick={() => window.open(`/pass/${application.id}`, '_blank')}
+                      onClick={() => window.open(`/pass?id=${application.id}`, '_blank')}
                       className="flex flex-col items-center gap-2 p-4 md:p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl hover:shadow-md transition border border-blue-100"
                     >
                       <span className="text-2xl md:text-3xl">🖨️</span>
